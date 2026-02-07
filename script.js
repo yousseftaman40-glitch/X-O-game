@@ -1,124 +1,73 @@
 'use strict'; 
-let turn ="X";
+let turn = "X";
 let winner = "";
 let win = document.querySelector(".win");
 let role = document.querySelector(".turn");
-let square1 = document.querySelector(".s1").innerHTML; 
-let square2 = document.querySelector(".s2").innerHTML; 
-let square3 = document.querySelector(".s3").innerHTML; 
-let square4 = document.querySelector(".s4").innerHTML; 
-let square5 = document.querySelector(".s5").innerHTML; 
-let square6 = document.querySelector(".s6").innerHTML; 
-let square7 = document.querySelector(".s7").innerHTML; 
-let square8 = document.querySelector(".s8").innerHTML; 
-let square9 = document.querySelector(".s9").innerHTML; 
 
+function checkWin() {
+    // 1. Get the FRESH values from the DOM every time checkWin is called
+    let s1 = document.querySelector(".s1").innerHTML;
+    let s2 = document.querySelector(".s2").innerHTML;
+    let s3 = document.querySelector(".s3").innerHTML;
+    let s4 = document.querySelector(".s4").innerHTML;
+    let s5 = document.querySelector(".s5").innerHTML;
+    let s6 = document.querySelector(".s6").innerHTML;
+    let s7 = document.querySelector(".s7").innerHTML;
+    let s8 = document.querySelector(".s8").innerHTML;
+    let s9 = document.querySelector(".s9").innerHTML;
 
-function checkWin(){
-    if(square1 === square2 && square1 ===square3 && square1 != ''){
-        if(square1 === 'X'){
-           return winner = "X";
-        }else{
-           return winner = "O"; 
-        }
-    } 
-    else if(square4 === square5 && square4 ===square6 && square4 != ''){
-        if(square1 === 'X'){
-           return winner = "X";
-        }else{
-           return winner = "O";
+    const waysToWin = [
+        [s1, s2, s3], [s4, s5, s6], [s7, s8, s9], // Rows
+        [s1, s4, s7], [s2, s5, s8], [s3, s6, s9], // Cols
+        [s1, s5, s9], [s3, s5, s7]               // Diagonals
+    ];
+
+    for (let combo of waysToWin) {
+        if (combo[0] !== '' && combo[0] === combo[1] && combo[0] === combo[2]) {
+            winner = combo[0]; 
+            return winner;
         }
     }
-    else if(square9 === square8 && square9 ===square7 && square9 != ''){
-        if(square1 === 'X'){          
-           return winner = "X";
-        }else{           
-           return winner = "O";
-        }
-    } 
-    else if(square1 === square4 && square1 ===square9 && square1 != ''){
-        if(square1 === 'X'){
-           return winner = "X";
-        }else{          
-           return winner = "O";
-        }
-    } 
-    else if(square2 === square5 && square2 ===square8 && square2 != ''){
-        if(square1 === 'X'){          
-           return winner = "X";
-        }else{          
-           return winner = "O";
-        }
+
+    // Check for draw
+    let allSquares = [s1, s2, s3, s4, s5, s6, s7, s8, s9];
+    if (allSquares.every(s => s !== '')) {
+        winner = "draw";
+        return winner;
     }
-    else if(square3 === square6 && square3 ===square7 && square3 != ''){
-        if(square1 === 'X'){          
-           return winner = "X";
-        }else{ 
-           return winner = "O";
-        }
-    } 
-    else if(square1 === square5 && square1 ===square7 && square1 != ''){
-        if(square1 === 'X'){   
-           return winner = "X";
-        }else{
-           return winner = "O"; 
-        }
-    } 
-    else if(square9 === square5 && square9 ===square3 && square9 != ''){
-        if(square1 === 'X'){
-            return winner = "X";
-        }else{     
-            return winner = "O";
-        }
-    }
-    if(square1 != ''  && square2 != '' && square3 != ''  &&square4 != ''  && square5 != ''  && square6 != ''  && square7 != ''  && square8 != ''  && square9 != ''){
-        return winner = "draw";
-    }
+
     return winner = "";
-}  
-
-
-
-
-
-
-
-
-
-
-
-function game(id){
-   let element = document.getElementById(id);
-   if(winner==""){
-      if(turn === 'X' &&  element.innerHTML == ''){
-         element.innerHTML = 'X';
-         turn = "O";
-         role.innerHTML = 'O';
-         document.body.style.backgroundColor = 'rgb(243, 61, 61)'; 
-         checkWin()             
-      }        
-      else if(turn === 'O' &&  element.innerHTML == ''){
-         element.innerHTML = 'O';
-         turn = "X";
-         role.innerHTML = 'X';
-         document.body.style.backgroundColor = 'rgb(49, 49, 241)';    
-         checkWin()    
-      } 
-   }else if(winner== "X"){
-      role.innerHTML = 'X' 
-      win.innerHTML = 'Winner:'
-      document.body.style.backgroundColor = 'rgb(49, 49, 241)'
-      checkWin()
-   }else if(winner== "O"){
-      role.innerHTML = 'O' 
-      win.innerHTML = 'Winner:'
-      document.body.style.backgroundColor = 'rgb(243, 61, 61)'
-      checkWin()
-   }else if(winner=="draw"){
-      role.innerHTML = ''
-      win.innerHTML = 'DRAW'
-      document.body.style.backgroundColor = 'rgb(75, 79, 85)'
-      checkWin()
-   }
-
 }
+
+function game(id) {
+    let element = document.getElementById(id);
+
+    // If square is already taken or game is over, do nothing
+    if (element.innerHTML !== '' || winner !== "") return;
+
+    // Set the move
+    element.innerHTML = turn;
+
+    // Check for winner immediately after making a move
+    checkWin();
+
+    if (winner === "X" || winner === "O") {
+        win.innerHTML = 'Winner:';
+        role.innerHTML = winner;
+        document.body.style.backgroundColor = (winner === 'X') ? 'rgb(49, 49, 241)' : 'rgb(243, 61, 61)';
+    } else if (winner === "draw") {
+        win.innerHTML = 'DRAW';
+        role.innerHTML = '';
+        document.body.style.backgroundColor = 'rgb(75, 79, 85)';
+    } else {
+        // No winner yet, switch turns
+        turn = (turn === "X") ? "O" : "X";
+        role.innerHTML = turn;
+        // Optional: Change background color based on whose turn it is
+        document.body.style.backgroundColor = (turn === 'X') ? 'rgb(49, 49, 241)' : 'rgb(243, 61, 61)';
+    }
+}
+function restart() {
+  window.location.reload();
+}
+
